@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, computed, watch, onActivated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { Line as LineChart } from 'vue-chartjs';
@@ -135,37 +135,40 @@ const isDarkMode = computed(() =>
 	document.documentElement.classList.contains('dark')
 );
 
-onMounted(async () => {
-	try {
-		const [cryptoResponse, chartDataResponse] = await Promise.all([
-			axios.get(
-				`https://api.coingecko.com/api/v3/coins/${route.params.id}`
-			),
-			axios.get(
-				`https://api.coingecko.com/api/v3/coins/${route.params.id}/market_chart?vs_currency=usd&days=7`
-			),
-		]);
+const fetchCryptoData = async () => {
+  try {
+    const [cryptoResponse, chartDataResponse] = await Promise.all([
+      axios.get(
+        `https://api.coingecko.com/api/v3/coins/${route.params.id}`
+      ),
+      axios.get(
+        `https://api.coingecko.com/api/v3/coins/${route.params.id}/market_chart?vs_currency=usd&days=7`
+      ),
+    ]);
 
-		crypto.value = cryptoResponse.data;
+    crypto.value = cryptoResponse.data;
 
-		const prices = chartDataResponse.data.prices;
-		chartData.value = {
-			labels: prices.map((price: number[]) =>
-				new Date(price[0]).toLocaleDateString()
-			),
-			datasets: [
-				{
-					label: 'Price (USD)',
-					data: prices.map((price: number[]) => price[1]),
-					borderColor: 'rgb(75, 192, 192)',
-					tension: 0.1,
-				},
-			],
-		};
-	} catch (error) {
-		console.error('Error fetching crypto details:', error);
-	}
-});
+    const prices = chartDataResponse.data.prices;
+    chartData.value = {
+      labels: prices.map((price: string[]) =>
+        new Date(price[0]).toLocaleDateString()
+      ),
+      datasets: [
+        {
+          label: 'Price (USD)',
+          data: prices.map((price: string[]) => price[1]),
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1,
+        },
+      ],
+    };
+
+    console.log('Chart data:', chartData.value);
+  } catch (error) {
+    console.error('Error fetching crypto details:', error);
+  }
+};
+onActivated(fetchCryptoData);
 
 const goBack = () => {
 	router.push({ name: 'CryptoList' });
