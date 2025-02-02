@@ -71,7 +71,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, onActivated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
 import { Line as LineChart } from 'vue-chartjs';
 import {
 	Chart as ChartJS,
@@ -124,6 +123,7 @@ ChartJS.register(
 const route = useRoute();
 const router = useRouter();
 const crypto = ref<CryptoType | null>(null);
+console.log("🚀 ~ crypto:", crypto)
 const chartInstance = ref<ChartInstanceType | null>(null);
 
 const chartData = ref<ChartDataType | null>(null);
@@ -138,17 +138,17 @@ const isDarkMode = computed(() =>
 const fetchCryptoData = async () => {
   try {
     const [cryptoResponse, chartDataResponse] = await Promise.all([
-      axios.get(
+      fetch(
         `https://api.coingecko.com/api/v3/coins/${route.params.id}`
       ),
-      axios.get(
+      fetch(
         `https://api.coingecko.com/api/v3/coins/${route.params.id}/market_chart?vs_currency=usd&days=7`
       ),
     ]);
 
-    crypto.value = cryptoResponse.data;
+    crypto.value = await cryptoResponse.json();
 
-    const prices = chartDataResponse.data.prices;
+    const prices =(await chartDataResponse.json()).prices;
     chartData.value = {
       labels: prices.map((price: string[]) =>
         new Date(price[0]).toLocaleDateString()
@@ -162,8 +162,6 @@ const fetchCryptoData = async () => {
         },
       ],
     };
-
-    console.log('Chart data:', chartData.value);
   } catch (error) {
     console.error('Error fetching crypto details:', error);
   }

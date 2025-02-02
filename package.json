@@ -8,11 +8,10 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint -c eslint.config.js",
-    "lint:fix": "eslint --fix --ext .js,.vue src",
+    "lint:fix": "eslint --fix -c eslint.config.js",
     "format": "prettier --write \"src/**/*.{js,vue,ts,tsx,json,css,scss,md}\""
   },
   "dependencies": {
-    "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "vue": "^3.5.13",
     "vue-chartjs": "^5.3.2",
@@ -26,7 +25,7 @@
     "autoprefixer": "^10.4.20",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.2",
+    "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-vue": "^9.32.0",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",

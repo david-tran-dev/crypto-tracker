@@ -86,7 +86,6 @@ type CryptoType = {
 	total_volume: number;
 };
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
 
 const cryptos = ref<CryptoType[]>([]);
@@ -94,20 +93,15 @@ const router = useRouter();
 
 const fetchCryptos = async () => {
 	try {
-		const response = await axios.get(
-			'https://api.coingecko.com/api/v3/coins/markets',
-			{
-				params: {
-					vs_currency: 'usd',
-					order: 'market_cap_desc',
-					per_page: 100,
-					page: 1,
-					sparkline: false,
-					price_change_percentage: '24h',
-				},
-			}
-		);
-		cryptos.value = response.data;
+	
+		const response = await fetch(
+      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h'
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+		cryptos.value = await response.json();
 	} catch (error) {
 		console.error('Error fetching crypto data:', error);
 	}
